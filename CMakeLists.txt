@@ -240,7 +240,7 @@ ENDIF( snark_BUILD_TESTS )
 
 INCLUDE( CMakeDependentOption )
 
-OPTION( snark_build_actuators "build actuators" OFF )
+OPTION( snark_build_actuators "build actuators" ON )
 OPTION( snark_build_batteries "build batteries" OFF )
 OPTION( snark_build_control "build control" OFF )
 OPTION( snark_build_geodesy_solar "build geodesy solar" ON )
