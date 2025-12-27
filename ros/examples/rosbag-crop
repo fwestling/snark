@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 import argparse
 import rosbag
@@ -21,23 +21,23 @@ def main():
     num_msgs = args.num_msgs
 
     if args.verbose:
-        print >> sys.stderr, "rosbag-crop: writing %s message%s on %s topic%s from %s to %s" % (
+        print("rosbag-crop: writing %s message%s on %s topic%s from %s to %s" % (
             num_msgs if num_msgs else "all", "" if num_msgs == 1 else "s",
             ",".join(topics) if args.topic else "all", "" if len(topics) == 1 else "s",
-            input_bag, output_bag )
+            input_bag, output_bag ), file=sys.stderr)
 
     msg_count = dict()
 
     with rosbag.Bag( output_bag, 'w' ) as outbag:
         for topic, msg, t in inbag.read_messages():
             if topic in topics:
-                if not msg_count.has_key( topic ):
+                if topic not in msg_count:
                     msgs_in_topic = inbag.get_message_count( topic )
                     msg_count[topic] = num_msgs if num_msgs < msgs_in_topic else msgs_in_topic
                 if msg_count[topic]:
                     outbag.write( topic, msg, t )
                     msg_count[topic] -= 1
-                    if len(msg_count.keys()) == len(topics):
+                    if len(list(msg_count.keys())) == len(topics):
                         msgs_remaining = sum( msg_count.values() )
                         if msgs_remaining == 0: break
 

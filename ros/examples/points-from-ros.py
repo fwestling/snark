@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 import rostopic
 import rospy
 import rosgraph
@@ -35,12 +35,12 @@ if args.list:
     master=rosgraph.masterapi.Master('/rostopic')
     topics=master.getPublishedTopics('/')
     for i in topics:
-        print i[0]
-        #print "%s,%s"%(i[0],i[1])
+        print(i[0])
+        #print("%s,%s" % (i[0],i[1]))
     sys.exit()
 
 if not args.topic:
-    print >>sys.stderr, "error: --topic must be specified"
+    print("error: --topic must be specified", file=sys.stderr)
     sys.exit(1)
 
 def message_type(topic):
@@ -54,9 +54,9 @@ def message_type(topic):
 if args.type:
     msg_type=message_type(args.topic)
     if msg_type:
-        print msg_type
+        print(msg_type)
         sys.exit()
-    print >>sys.stderr, "topic not found:",args.topic
+    print("topic not found:", args.topic, file=sys.stderr)
     sys.exit(1)
 
 def check_type(topic):

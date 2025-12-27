@@ -6,9 +6,9 @@
 - hosts: localhost
   connection: local
   vars:
-  - make_j: 6
-  - base: "{{ ansible_env.HOME }}"
-  - snark_cmake_options: "-DBUILD_TESTS=ON -DINSTALL_TESTS=ON -DINSTALL_BASH_COMPLETION=ON Dsnark_build_control=ON -Dsnark_build_graph=ON -Dsnark_build_graphics=ON -Dsnark_build_math_fft=ON -Dsnark_build_geometry=ON -Dsnark_build_point_cloud=ON Dsnark_build_python=ON -Dsnark_build_sensors_dc1394=ON -Dsnark_build_sensors_velodyne=ON -Dsnark_build_sensors_vimba=ON -Dsnark_build_web=ON -Dsnark_build_web_feeds=ON -Dsnark_build_imaging=ON -Dsnark_build_imaging_stereo=OFF"
+    make_j: 6
+    base: "{{ ansible_env.HOME }}"
+    snark_cmake_options: "-DBUILD_TESTS=ON -DINSTALL_TESTS=ON -DINSTALL_BASH_COMPLETION=ON Dsnark_build_control=ON -Dsnark_build_graph=ON -Dsnark_build_graphics=ON -Dsnark_build_math_fft=ON -Dsnark_build_geometry=ON -Dsnark_build_point_cloud=ON Dsnark_build_python=ON -Dsnark_build_sensors_dc1394=ON -Dsnark_build_sensors_velodyne=ON -Dsnark_build_sensors_vimba=OFF -Dsnark_build_web=ON -Dsnark_build_web_feeds=ON -Dsnark_build_imaging=ON -Dsnark_build_imaging_stereo=OFF"
 
   tasks:
   - name: "snark: dependencies: installing"
@@ -24,46 +24,48 @@
       - libopencv-highgui-dev
       - libpcap-dev
       - qtbase5-dev 
-      - qt5-default 
+      - qtchooser
+      - qt5-qmake
+      - qtbase5-dev-tools
       - qt3d5-dev
       - libassimp-dev
-      - python-opencv
-      - libqt4-dev
-      - python-pip
+      - python3-opencv
+      - python3-pip
 
   - pip:
         name: "pysolar"
-        executable: pip
+        executable: pip3
+        extra_args: --break-system-packages
     become: true
 
-  - name: "snark: dependencies: vimba: download"
-    get_url:
-        url: "https://cdn.alliedvision.com/fileadmin/content/software/software/Vimba/Vimba_v2.1.3_Linux.tgz"
-        dest: "/tmp/Vimba_v2.1.3_Linux.tgz"
+  # - name: "snark: dependencies: vimba: download"
+  #   get_url:
+  #       url: "https://cdn.alliedvision.com/fileadmin/content/software/software/Vimba/Vimba_v2.1.3_Linux.tgz"
+  #       dest: "/tmp/Vimba_v2.1.3_Linux.tgz"
 
-  - name: "snark: dependencies: vimba: extract"
-    unarchive:
-        src: "/tmp/Vimba_v2.1.3_Linux.tgz"
-        dest: "/opt"
-    become: true
+  # - name: "snark: dependencies: vimba: extract"
+  #   unarchive:
+  #       src: "/tmp/Vimba_v2.1.3_Linux.tgz"
+  #       dest: "/opt"
+  #   become: true
 
-  - name: "snark: dependencies: vimba: library symlink"
-    file:
-        dest: /opt/vimba
-        src: /opt/Vimba_2_1
-        state: link
-    become: true
-    
-  - name: "snark: dependencies: vimba: VimbaViever symlink"
-    file:
-        dest: /usr/local/bin/vimba-viewer
-        src: /opt/vimba/Tools/Viewer/Bin/x86_64bit/VimbaViewer
-        state: link
-    become: true
+  # - name: "snark: dependencies: vimba: library symlink"
+  #   file:
+  #       dest: /opt/vimba
+  #       src: /opt/Vimba_2_1
+  #       state: link
+  #   become: true
+  #   
+  # - name: "snark: dependencies: vimba: VimbaViever symlink"
+  #   file:
+  #       dest: /usr/local/bin/vimba-viewer
+  #       src: /opt/vimba/Tools/Viewer/Bin/x86_64bit/VimbaViewer
+  #       state: link
+  #   become: true
 
-  - name: "snark: dependencies: vimba: running install"
-    command: chdir=/opt/vimba/VimbaGigETL ./Install.sh
-    become: true
+  # - name: "snark: dependencies: vimba: running install"
+  #   command: chdir=/opt/vimba/VimbaGigETL ./Install.sh
+  #   become: true
       
   - name: "snark: make source directory at {{ base }}"
     file: path={{ base }}/{{ item }} state=directory
@@ -71,15 +73,15 @@
         - src
         - build
       
-  - name: "snark: dependencies: clone comma"
-    git:
-        repo: "https://gitlab.com/orthographic/comma.git"
-        dest: "{{ base }}/src/comma"
-        clone: yes
-        update: yes
+  # - name: "snark: dependencies: clone comma"
+  #   git:
+  #       repo: "https://gitlab.com/orthographic/comma.git"
+  #       dest: "{{ base }}/src/comma"
+  #       clone: yes
+  #       update: yes
       
-  - name: "snark: dependencies: install comma"
-    script: /usr/bin/ansible-playbook {{ base }}/src/comma/system/ansible/install.yml
+  # - name: "snark: dependencies: install comma"
+  #   script: /usr/bin/ansible-playbook {{ base }}/src/comma/system/ansible/install.yml
     
   - name: "snark: clone"
     git:

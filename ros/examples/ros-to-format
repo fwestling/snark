@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 import rospy
 import sys
 import argparse
@@ -6,7 +6,9 @@ from sensor_msgs.msg import PointCloud
 #import ros_msg_to_csv
 import rosmsg
 
-execfile('/usr/local/bin/ros_msg_to_csv')
+with open('/usr/local/bin/ros_msg_to_csv') as f:
+    code = compile(f.read(), '/usr/local/bin/ros_msg_to_csv', 'exec')
+    exec(code)
 
 help_description='print format and field information for a ros message type'
 help_example="""
@@ -30,11 +32,11 @@ args=parse_args()
 
 msg_map=msg_map()
 if args.format:
-    print msg_map[args.message_type].binary()
+    print(msg_map[args.message_type].binary())
 elif args.fields:
-    print msg_map[args.message_type].fields()
+    print(msg_map[args.message_type].fields())
 elif args.list:
-    for i in msg_map.iterkeys():
-        print i
+    for i in msg_map.keys():
+        print(i)
 else:
-    print >> sys.stderr, 'error: at least one operation must be specified'
+    print('error: at least one operation must be specified', file=sys.stderr)

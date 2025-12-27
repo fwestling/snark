@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 # This file is part of snark, a generic and flexible library for robotics research
 # Copyright (c) 2011 The University of Sydney
@@ -30,16 +30,15 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import json
-import urlparse
-import BaseHTTPServer
-import SocketServer
+import urllib.parse
+import http.server
+import socketserver
 import argparse
-import commands
 import subprocess
 import sys
 import os
 import collections
-import httplib
+import http.client
 import signal
 import shlex
 import threading
@@ -179,7 +178,7 @@ class sensors:
                 self._find_sensor_names( item, xpath+"["+str(i)+"]" )
                 i=i+1
         else:
-            for key,value in dictionary.iteritems():
+            for key,value in dictionary.items():
                 if type( value ) == dict:
                     xpath_key = ( xpath + '/' + key ) if xpath else key
                     if 'command' in value: self._names.append( xpath_key )
@@ -190,7 +189,7 @@ class sensors:
                     
     def print_list(self):
         sys.stderr.write("print_list %d \n"%len(self._parameters))
-        for name,value in self._parameters.iteritems():
+        for name,value in self._parameters.items():
             print("%s=%s;%s" % (name,value.command,value.content_type))
 
     def __init__( self, web_config, robot_config, publish_config ):
@@ -220,7 +219,7 @@ def _quote_html(html):
     return html.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
-class handler( BaseHTTPServer.BaseHTTPRequestHandler ):
+class handler( http.server.BaseHTTPRequestHandler ):
     def send_error_response(self, code, message=None):
         try:
             short, long = self.responses[code]
@@ -256,7 +255,7 @@ class handler( BaseHTTPServer.BaseHTTPRequestHandler ):
         if params.has_key('_'):
             del params['_']
         param_list=[]
-        for key, value in params.iteritems():
+        for key, value in params.items():
             param_list.append("=".join([str(key), str(value)]))
         query = urlparse.urlparse(self.path).query
         #print("param_list %s \n" % param_list)
@@ -326,7 +325,7 @@ def load_config( config_file_name ):
     if not config_file_name: return {}
     # parsing through name-value-convert first is needed since json.load throws on json files with comments
     command = "name-value-convert --to json < %s" % config_file_name
-    status, output = commands.getstatusoutput( command )
+    status, output = subprocess.getstatusoutput( command )
     if status != 0: sys.exit( "%s: '%s' returned error: %s" % ( script_name, command, output ) )
     return json.loads( output )
 
@@ -353,7 +352,7 @@ signal.signal( signal.SIGINT, trap )
 signal.signal( signal.SIGTERM, trap )
 signal.signal( signal.SIGHUP, trap )
 
-class async_http_server( SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer ): pass
+class async_http_server( socketserver.ThreadingMixIn, http.server.HTTPServer ): pass
 
 async_http_server( ( '', args.port ), handler ).serve_forever()
 

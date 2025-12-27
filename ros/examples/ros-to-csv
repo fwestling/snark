@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 import rostopic
 import rospy
 import rosgraph
@@ -6,7 +6,9 @@ import sys
 import argparse
 import time
 
-execfile('/usr/local/bin/ros_msg_to_csv')
+with open('/usr/local/bin/ros_msg_to_csv') as f:
+    code = compile(f.read(), '/usr/local/bin/ros_msg_to_csv', 'exec')
+    exec(code)
 
 help_description='listen to a ros topic, convert the data to csv and write to stdout'
 help_example="""
@@ -30,12 +32,12 @@ if args.list:
     master=rosgraph.masterapi.Master('/rostopic')
     topics=master.getPublishedTopics('/')
     for i in topics:
-        print i[0]
-        #print "%s,%s"%(i[0],i[1])
+        print(i[0])
+        #print("%s,%s" % (i[0],i[1]))
     sys.exit()
 
 if not args.topic:
-    print >>sys.stderr, "error: --topic must be specified"
+    print("error: --topic must be specified", file=sys.stderr)
     sys.exit(1)
     
 def message_type(topic):
@@ -49,15 +51,15 @@ def message_type(topic):
 if args.type:
     msg_type=message_type(args.topic)
     if msg_type:
-        print msg_type
+        print(msg_type)
         sys.exit()
     #master=rosgraph.masterapi.Master('/rostopic')
     #topics=master.getPublishedTopics('/')
     #for i in topics:
         #if i[0]==args.topic:
-            #print i[1]
+            #print(i[1])
             #sys.exit()
-    print >>sys.stderr, "topic not found:",args.topic
+    print("topic not found:", args.topic, file=sys.stderr)
     sys.exit(1)
     
 
